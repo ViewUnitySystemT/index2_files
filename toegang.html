@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benadering naar Nul — Oneindig Proces</title>
+  <style>
+    /* General body styling */
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Title styling */
+    h1 {
+      margin-top: 20px;
+      font-size: 32px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Canvas styling */
+    #canvas {
+      background-color: #222;
+      display: block;
+      margin: 40px auto;
+      border: 2px solid #444;
+    }
+
+    /* Button styling */
+    #stopButton {
+      background-color: orange;
+      border: none;
+      color: #111;
+      padding: 12px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 20px;
+      box-shadow: 0 4px 8px rgba(255, 165, 0, 0.3);
+      transition: background-color 0.3s ease, transform 0.2s;
+    }
+
+    /* Button hover effect */
+    #stopButton:hover {
+      background-color: #ff9900;
+      transform: scale(1.05);
+    }
+
+    /* Animated background gradient */
+    @keyframes gradientAnimation {
+      0% { background: linear-gradient(135deg, #111, #222); }
+      50% { background: linear-gradient(135deg, #333, #444); }
+      100% { background: linear-gradient(135deg, #111, #222); }
+    }
+
+    body {
+      animation: gradientAnimation 5s infinite alternate;
+    }
+  </style>
+</head>
+<body>
+  <h1>Benadering naar Nul — Oneindig Proces</h1>
+  <canvas id="canvas" width="800" height="200"></canvas>
+  <button id="stopButton">🛑 Stop en ga naar TEL1.nl</button>
+
+  <script>
+    // Select canvas and button elements
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const stopButton = document.getElementById("stopButton");
+
+    // Canvas midpoints and scale for drawing
+    const midX = canvas.width / 2;
+    const midY = canvas.height / 2;
+    const scale = 300;
+
+    // Variables for animation
+    let n = 0; // Step counter
+    let running = true;
+
+    // Time-based movement for fluid animation
+    let time = 0;
+
+    /**
+     * Draws the axis and a central marker on the canvas
+     */
+    function drawAxis() {
+      // Draw X-axis
+      ctx.strokeStyle = "#888";
+      ctx.beginPath();
+      ctx.moveTo(0, midY);
+      ctx.lineTo(canvas.width, midY);
+      ctx.stroke();
+
+      // Draw central marker
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(midX, midY, 4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    /**
+     * Main animation loop
+     */
+    function animate() {
+      // Stop animation if running is set to false
+      if (!running) return;
+
+      // Clear canvas for the next frame
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw axis
+      drawAxis();
+
+      // Calculate delta as 1 / 2^n
+      const delta = 1 / Math.pow(2, n);
+
+      // Calculate positions for left and right points
+      const x_neg = -delta / 2; // Left point
+      const x_pos = delta / 2;  // Right point
+
+      // Animated effect for point movement
+      const moveFactor = Math.sin(time * 0.1); // Sine wave effect for smooth movement
+
+      // Draw left point in blue, with animation
+      ctx.fillStyle = `rgb(0, 0, ${Math.abs(moveFactor * 255)})`;
+      ctx.beginPath();
+      ctx.arc(midX + x_neg * scale, midY + moveFactor * 10, 10, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Draw right point in green, with animation
+      ctx.fillStyle = `rgb(0, ${Math.abs(moveFactor * 255)}, 0)`;
+      ctx.beginPath();
+      ctx.arc(midX + x_pos * scale, midY + moveFactor * 10, 10, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Display textual information
+      ctx.fillStyle = "#fff";
+      ctx.font = "16px Arial";
+      ctx.fillText(`Stap n = ${n}`, 10, 20); // Step count
+      ctx.fillText(`x₋ = ${x_neg.toExponential(10)}`, 10, 40); // Left point value
+      ctx.fillText(`x₊ = ${x_pos.toExponential(10)}`, 10, 60); // Right point value
+      ctx.fillText(`Δ (verschil) = ${delta.toExponential(10)}`, 10, 80); // Delta value
+
+      // Increment step counter
+      n++;
+      time++;
+
+      // Request next animation frame
+      requestAnimationFrame(animate);
+    }
+
+    // Event listener for stopping the animation and redirecting
+    stopButton.addEventListener("click", () => {
+      running = false; // Stop animation
+      window.location.href = "https://www.tel1.nl"; // Redirect to website
+    });
+
+    // Start the animation
+    animate();
+  </script>
+</body>
+</html>
